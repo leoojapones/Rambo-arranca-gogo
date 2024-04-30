@@ -1,0 +1,82 @@
+import robocode.*;
+
+public class RamboArrancaGogo extends AdvancedRobot {
+
+    // Variáveis para controlar o movimento
+    private double velocidade = 5;
+    private double angulo = 0;
+    private boolean paredeDianteira = false;
+    private boolean inimigoDetectado = false;
+
+    // Cores para o robô
+    private static final int COR_CORPO = 0x006600; // Verde escuro
+    private static final int COR_RADAR = 0x00FF00; // Verde claro
+
+    public RamboArrancaGogo() {
+        // Configurar o nome e a cor do robô
+        setColors(COR_CORPO, COR_RADAR, "Rambo Arranca Gogo", "Rambo Arranca Gogo");
+    }
+
+    public void run() {
+        // Ajustar o radar para girar 360 graus
+        setTurnGunRight(360);
+
+        // Loop principal do robô
+        while (true) {
+            // Atualizar variáveis de controle
+            atualizarEstado();
+
+            // Movimentar o robô
+            movimentar();
+
+            // Atirar em inimigos
+            atirarEmInimigos();
+
+            // Executar ações adicionais (opcional)
+            // ...
+
+            // Executar ações de tick
+            execute();
+        }
+    }
+
+    private void atualizarEstado() {
+        // Verificar se há uma parede à frente
+        paredeDianteira = getScanAhead(100) < 0;
+
+        // Verificar se há inimigos próximos
+        inimigoDetectado = getScanResults(360).size() > 0;
+    }
+
+    private void movimentar() {
+        // Mover para frente se não houver parede à frente
+        if (!paredeDianteira) {
+            setAhead(velocidade);
+        } else {
+            // Girar para trás se houver parede à frente
+            setBack(velocidade);
+            angulo += 45;
+            setTurnRight(angulo);
+        }
+
+        // Mover para os lados se não houver inimigo detectado
+        if (!inimigoDetectado) {
+            if (random() < 0.5) {
+                setTurnLeft(45);
+            } else {
+                setTurnRight(45);
+            }
+        }
+    }
+
+    private void atirarEmInimigos() {
+        // Se um inimigo for detectado, girar o canhão e atirar
+        if (inimigoDetectado) {
+            double anguloInimigo = getHeading() + getGunHeading() + getScanResults(360).get(0).getBearing();
+            setTurnGunRight(anguloInimigo - getGunHeading());
+            if (getGunHeat() == 0) {
+                fire(3);
+            }
+        }
+    }
+}
