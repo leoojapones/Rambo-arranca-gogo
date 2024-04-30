@@ -1,0 +1,43 @@
+import robocode.*;
+import java.awt.Color;
+
+public class RamboArrancaGogo extends AdvancedRobot {
+
+    public void run() {
+        // Definindo cor do robô
+        setBodyColor(new Color(0, 100, 0)); // Verde escuro
+        setGunColor(new Color(0, 50, 0)); // Verde escuro mais escuro
+        setRadarColor(new Color(0, 150, 0)); // Verde escuro mais claro
+
+        // Loop principal
+        while(true) {
+            // Movimento para frente
+            ahead(100);
+            // Movimento para trás
+            back(100);
+            // Movimento para os lados
+            turnLeft(90);
+            turnRight(90);
+        }
+    }
+
+    public void onHitWall(HitWallEvent e) {
+        // Se colidir com a parede, vira para uma direção aleatória
+        turnLeft(90);
+    }
+
+    public void onScannedRobot(ScannedRobotEvent e) {
+        // Atira quando detecta um inimigo
+        fire(1);
+        // Desvia dos ataques do inimigo
+        if (e.getBearing() > -90 && e.getBearing() <= 90) {
+            // Se o inimigo estiver à direita, desvia para a esquerda
+            back(50);
+            turnLeft(90);
+        } else {
+            // Se o inimigo estiver à esquerda, desvia para a direita
+            back(50);
+            turnRight(90);
+        }
+    }
+}
